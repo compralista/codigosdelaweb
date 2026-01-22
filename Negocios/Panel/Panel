@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Gestión</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #a29bfe;
+      --success: #00b894;
+      --danger: #d63031;
+      --warning: #fdcb6e;
+      --dark: #2d3436;
+      --light: #dfe6e9;
+      --bg: #f4f7f6;
+      --white: #ffffff;
+      --border: #eee;
+      --input-bg: #f9f9f9;
+      --hover-row: #fafafa;
+    }
+
+    /* === MODO OSCURO === */
+    body.dark-mode {
+      --primary: #8e7ceb;
+      --dark: #ecf0f1;
+      --light: #2d3436;
+      --bg: #1e1e2f;
+      --white: #27293d;
+      --border: #444;
+      --input-bg: #1e1e2e;
+      --hover-row: #32324a;
+    }
+
+    body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--dark); margin: 0; padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
+    
+    /* HEADER */
+    .app-header {
+      background: var(--white);
+      padding: 15px 20px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s;
+    }
+    .brand { font-weight: 600; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+    .brand span { color: var(--dark); font-weight: 400; font-size: 0.9rem; background: var(--light); padding: 4px 10px; border-radius: 20px;}
+
+    .header-actions { display: flex; gap: 10px; }
+
+    .btn-logout, .btn-theme { background: transparent; border: 2px solid var(--border); color: #888; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+    .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-theme:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* CONTENEDOR PRINCIPAL */
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+
+    /* BARRA DE ACCIÓN (AQUÍ ESTÁ LA CORRECCIÓN) */
+    .action-bar {
+      display: flex;
+      gap: 15px; /* Más espacio entre elementos */
+      margin-bottom: 20px;
+      background: var(--white);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+      flex-wrap: wrap;
+      align-items: center; /* Alinea verticalmente al centro */
+      transition: background 0.3s;
+    }
+    
+    .search-box {
+      flex-grow: 1; /* Ocupa el espacio disponible */
+      position: relative;
+      min-width: 200px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 12px 12px 12px 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--dark);
+      font-family: inherit;
+      box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
+      transition: background 0.3s, color 0.3s;
+    }
+    .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+
+    .btn-add {
+      background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px;
+      font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+      transition: 0.3s;
+      flex-shrink: 0; /* IMPORTANTE: Esto impide que el botón sea aplastado */
+      white-space: nowrap; /* Evita que el texto del botón salte de línea */
+    }
+    .btn-add:hover { transform: translateY(-2px); background: #5849c2; }
+
+    /* FORMULARIO AGREGAR */
+    #add-product-form {
+      background: var(--white);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      animation: slideDown 0.3s ease-out;
+      transition: background 0.3s;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    
+    .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; background: var(--input-bg); color: var(--dark); box-sizing: border-box; }
+    .form-input:focus { border-color: var(--primary); outline: none; }
+
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-confirm { background: var(--success); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+    .btn-cancel { background: var(--light); color: #666; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+
+    /* TABLA */
+    .table-container {
+      background: var(--white);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+      overflow-x: auto;
+      transition: background 0.3s;
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { text-align: left; padding: 18px; color: #888; font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+    td { padding: 15px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--hover-row); }
+
+    .product-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #eee; }
+    
+    /* INPUTS EN MODO EDICIÓN */
+    .edit-input { width: 100%; padding: 8px; border: 1px solid var(--secondary); border-radius: 6px; background: var(--input-bg); color: var(--dark); box-sizing: border-box; }
+
+    /* BOTONES ACCIÓN TABLA */
+    .action-btn { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; margin-right: 5px; }
+    .btn-edit-row { background: rgba(253, 203, 110, 0.2); color: #d35400; }
+    .btn-delete-row { background: rgba(214, 48, 49, 0.1); color: var(--danger); }
+    .btn-save-row { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+    .btn-cancel-row { background: var(--light); color: #666; }
+
+    /* ESTADOS */
+    .status-toast {
+      position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 15px 25px; border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 999; animation: slideIn 0.3s; display: flex; align-items: center; gap: 10px;
+    }
+    .status-toast.error { background: var(--danger); }
+    .status-toast.success { background: var(--success); }
+    .hidden { display: none; }
+
+    @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* RESPONSIVE (MÓVIL) */
+    @media (max-width: 768px) {
+      /* Ajuste para que el buscador no tape el botón en móviles */
+      .action-bar {
+        flex-direction: column; /* Pone uno debajo del otro */
+        align-items: stretch;   /* Ocupan todo el ancho */
+        gap: 15px;
+      }
+      .search-box, .btn-add {
+        width: 100%;
+        margin: 0;
+        justify-content: center; /* Centra el texto del botón */
+      }
+
+      .table-container { background: transparent; box-shadow: none; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr { background: var(--white); margin-bottom: 15px; border-radius: 15px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; }
+      td { padding: 8px 0; border: none; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+      td::before { content: attr(data-label); font-weight: 600; color: #888; font-size: 0.85rem; }
+      
+      .product-img { width: 60px; height: 60px; }
+      td[data-label="IMG"] { justify-content: center; margin-bottom: 10px; }
+      td[data-label="IMG"]::before { display: none; }
+      td[data-label="ACCIONES"] { margin-top: 10px; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+      td[data-label="ACCIONES"]::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">
+      <i class="fas fa-box-open"></i> Panel <span><?= negocio_id ?></span>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn-theme" onclick="toggleTheme()" title="Cambiar Tema">
+        <i class="fas fa-moon" id="theme-icon"></i>
+      </button>
+      <button class="btn-logout" onclick="logout()" title="Cerrar Sesión">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <div class="action-bar">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Buscar productos...">
+      </div>
+      <button class="btn-add" onclick="showAddForm()">
+        <i class="fas fa-plus"></i> Nuevo
+      </button>
+    </div>
+
+    <div id="add-product-form" class="hidden">
+      <h3><i class="fas fa-tag"></i> Nuevo Producto</h3>
+      <div class="form-grid">
+        <input type="text" id="new_id" class="form-input" placeholder="ID (Ej: 101)">
+        <input type="text" id="new_nombre" class="form-input" placeholder="Nombre del Producto" required>
+        <input type="number" id="new_precio" class="form-input" placeholder="Precio ($)" required>
+        <input type="text" id="new_categoria" class="form-input" placeholder="Categoría">
+        <input type="url" id="new_img" class="form-input" placeholder="URL de Imagen">
+        <input type="number" id="new_stock" class="form-input" placeholder="Stock">
+        <select id="new_promocion" class="form-input">
+            <option value="">¿Promoción?</option>
+            <option value="TRUE">Sí</option>
+            <option value="FALSE">No</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" onclick="hideAddForm()">Cancelar</button>
+        <button class="btn-confirm" onclick="addNewProduct()">Guardar Producto</button>
+      </div>
+    </div>
+
+    <div id="loading-status" style="text-align: center; padding: 20px; color: #888;">
+      <i class="fas fa-circle-notch fa-spin"></i> Cargando productos...
+    </div>
+
+    <div class="table-container">
+      <table id="products-table">
+        <thead>
+          </thead>
+        <tbody>
+          </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="toast" class="status-toast hidden">
+    <span id="toast-msg">Mensaje</span>
+  </div>
+
+<script>
+  const NEGOCIO_ID = '<?= negocio_id ?>'; 
+  let allProducts = [];
+  const PRODUCT_HEADERS_ORDERED = ['id', 'img', 'nombre', 'precio', 'categoria', 'stock', 'promocion'];
+  let isEditing = false;
+  
+  window.onload = function() { 
+    loadProducts(); 
+    if(localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
+    }
+  };
+
+  function toggleTheme() {
+    const body = document.body;
+    const icon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    if (body.classList.contains('dark-mode')) {
+      icon.classList.replace('fa-moon', 'fa-sun');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      icon.classList.replace('fa-sun', 'fa-moon');
+      localStorage.setItem('theme', 'light');
+    }
+  }
+  
+  function showToast(msg, type = 'info') {
+    const toast = document.getElementById('toast');
+    const msgEl = document.getElementById('toast-msg');
+    toast.className = `status-toast ${type}`;
+    msgEl.innerHTML = msg; 
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 4000);
+  }
+
+  function showAddForm() {
+    document.getElementById('add-product-form').classList.remove('hidden');
+    document.getElementById('new_nombre').focus();
+  }
+  
+  function hideAddForm() {
+    document.getElementById('add-product-form').classList.add('hidden');
+    document.querySelectorAll('.form-input').forEach(i => i.value = '');
+  }
+
+  function loadProducts() {
+    google.script.run
+      .withSuccessHandler(renderProducts)
+      .withFailureHandler(e => showToast(`<i class="fas fa-exclamation-triangle"></i> Error: ${e.message}`, 'error'))
+      .getProductos(NEGOCIO_ID); 
+  }
+
+  function addNewProduct() {
+    const newProduct = {
+      id: document.getElementById('new_id').value, 
+      nombre: document.getElementById('new_nombre').value,
+      precio: document.getElementById('new_precio').value,
+      categoria: document.getElementById('new_categoria').value,
+      img: document.getElementById('new_img').value,
+      stock: document.getElementById('new_stock').value,
+      promocion: document.getElementById('new_promocion').value,
+    };
+    
+    if (!newProduct.nombre || !newProduct.precio) {
+        showToast('Nombre y Precio son obligatorios', 'error');
+        return;
+    }
+    
+    showToast('<i class="fas fa-spinner fa-spin"></i> Guardando...', 'info');
+    
+    google.script.run
+      .withSuccessHandler(res => {
+          if(res.success) {
+              showToast('<i class="fas fa-check"></i> Producto Agregado', 'success');
+              hideAddForm();
+              loadProducts();
+          } else {
+              showToast(res.error, 'error');
+          }
+      })
+      .withFailureHandler(e => showToast(e.message, 'error'))
+      .agregarProducto(NEGOCIO_ID, newProduct); 
+  }
+
+  function renderProducts(response) {
+    document.getElementById('loading-status').style.display = 'none';
+    if (!response.success) return showToast(response.error, 'error');
+    
+    allProducts = response.products;
+    const tbody = document.querySelector('#products-table tbody');
+    const thead = document.querySelector('#products-table thead');
+    tbody.innerHTML = '';
+    thead.innerHTML = '';
+
+    if (allProducts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">No hay productos.</td></tr>';
+      return;
+    }
+    
+    let headerRow = thead.insertRow();
+    PRODUCT_HEADERS_ORDERED.forEach(h => {
+        let th = document.createElement('th');
+        th.textContent = h.toUpperCase();
+        headerRow.appendChild(th);
+    });
+    headerRow.appendChild(document.createElement('th')).textContent = 'ACCIONES';
+
+    displayProducts(allProducts);
+  }
+
+  function displayProducts(products) {
+    const tbody = document.querySelector('#products-table tbody');
+    tbody.innerHTML = '';
+
+    products.forEach(p => {
+        let tr = tbody.insertRow();
+        tr.dataset.row = p.row;
+
+        PRODUCT_HEADERS_ORDERED.forEach(key => {
+            let td = tr.insertCell();
+            td.dataset.column = key;
+            td.dataset.label = key.toUpperCase(); 
+            
+            if (key === 'img') {
+                if (p[key] && p[key].startsWith('http')) {
+                    td.innerHTML = `<img src="${p[key]}" class="product-img" onclick="window.open('${p[key]}')">`;
+                } else {
+                    td.innerHTML = `<span style="color:#ccc; font-size:20px;"><i class="fas fa-image"></i></span>`;
+                }
+            } else if(key === 'precio') {
+                td.textContent = `$${p[key]}`;
+                td.dataset.val = p[key]; 
+            } else {
+                td.textContent = p[key];
+            }
+        });
+
+        let tdAction = tr.insertCell();
+        tdAction.dataset.label = 'ACCIONES';
+        tdAction.classList.add('action-cell');
+        tdAction.innerHTML = `
+            <button class="action-btn btn-edit-row" onclick="startEdit(this)"><i class="fas fa-pen"></i></button>
+            <button class="action-btn btn-delete-row" onclick="deleteProduct(${p.row}, '${p.nombre}')"><i class="fas fa-trash"></i></button>
+        `;
+    });
+  }
+
+  function startEdit(btn) {
+    if(isEditing) return showToast('Termina la edición actual primero', 'error');
+    isEditing = true;
+    const tr = btn.closest('tr');
+    const rowNum = tr.dataset.row;
+    const product = allProducts.find(p => p.row == rowNum);
+
+    Array.from(tr.cells).forEach(td => {
+        const key = td.dataset.column;
+        if(!key) return; 
+
+        let val = product[key];
+        let input;
+
+        if (key === 'promocion') {
+            input = document.createElement('select');
+            input.innerHTML = `<option value="TRUE">Sí</option><option value="FALSE">No</option>`;
+            input.value = String(val).toUpperCase();
+        } else {
+            input = document.createElement('input');
+            input.type = (key === 'precio' || key === 'stock' || key === 'id') ? 'number' : 'text';
+            input.value = val;
+        }
+        
+        input.classList.add('edit-input');
+        td.innerHTML = '';
+        td.appendChild(input);
+    });
+
+    const tdAction = tr.querySelector('.action-cell');
+    tdAction.innerHTML = `
+        <button class="action-btn btn-save-row" onclick="saveEdit(this)"><i class="fas fa-check"></i></button>
+        <button class="action-btn btn-cancel-row" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+    `;
+  }
+
+  function cancelEdit() {
+    isEditing = false;
+    displayProducts(allProducts);
+  }
+
+  function saveEdit(btn) {
+    const tr = btn.closest('tr');
+    const rowNum = tr.dataset.row;
+    const updatedData = {};
+    let hasChanges = false;
+    const product = allProducts.find(p => p.row == rowNum);
+
+    Array.from(tr.cells).forEach(td => {
+        const key = td.dataset.column;
+        if(!key) return;
+        const input = td.querySelector('input, select');
+        if(String(input.value) !== String(product[key])) {
+            updatedData[key] = input.value;
+            hasChanges = true;
+        }
+    });
+
+    if(!hasChanges) return cancelEdit();
+
+    showToast('<i class="fas fa-save"></i> Guardando...', 'info');
+    
+    google.script.run
+      .withSuccessHandler(res => {
+          isEditing = false;
+          if(res.success) {
+              showToast('Guardado correctamente', 'success');
+              loadProducts();
+          } else {
+              showToast(res.error, 'error');
+              cancelEdit();
+          }
+      })
+      .withFailureHandler(e => showToast(e.message, 'error'))
+      .guardarProducto(NEGOCIO_ID, Number(rowNum), updatedData);
+  }
+
+  function deleteProduct(rowNum, name) {
+    if(!confirm(`¿Eliminar "${name}"?`)) return;
+    showToast('<i class="fas fa-trash"></i> Eliminando...', 'info');
+    google.script.run
+      .withSuccessHandler(res => {
+          if(res.success) {
+              showToast('Eliminado', 'success');
+              loadProducts();
+          } else {
+              showToast(res.error, 'error');
+          }
+      })
+      .withFailureHandler(e => showToast(e.message, 'error'))
+      .eliminarProducto(NEGOCIO_ID, Number(rowNum));
+  }
+
+  function filterProducts() {
+    const txt = document.getElementById('product-search').value.toLowerCase();
+    const filtered = allProducts.filter(p => 
+        Object.values(p).some(val => String(val).toLowerCase().includes(txt))
+    );
+    displayProducts(filtered);
+  }
+
+  function logout() {
+    window.top.location.href = '<?= ScriptApp.getService().getUrl() ?>';
+  }
+</script>
+
+</body>
+</html>
