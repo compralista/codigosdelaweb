@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Horarios | Panel de Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde: #2E7D32;
+      --verde-claro: #E8F5E9;
+      --rojo: #d32f2f;
+      --gris-suave: #f0f2f5;
+      --borde: #e0e0e0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--gris-suave);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 550px;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: var(--verde);
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .dia-card {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .dia-card.cerrado-active {
+      background-color: #f9f9f9;
+      border-color: #ffcdd2;
+    }
+
+    .header-fila {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .nombre-dia {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      text-transform: capitalize;
+    }
+
+    .switch-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    /* Estilos de inputs */
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .bloque-turno label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #777;
+      margin-bottom: 5px;
+    }
+
+    .inputs-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--verde);
+      background-color: var(--verde-claro);
+    }
+
+    input:disabled {
+      background-color: #eee;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    /* Sección de Motivos */
+    .motivo-container {
+      border-top: 1px dashed var(--borde);
+      padding-top: 12px;
+    }
+
+    .motivo-container label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #2c3e50;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .input-motivo {
+      width: 100%;
+      border: none;
+      background: transparent;
+      border-bottom: 1px solid #ccc;
+      padding: 5px 0;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* Botón Guardar */
+    .btn-save {
+      background: var(--verde);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s;
+      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-save:hover { background: #1b5e20; }
+    .btn-save:disabled { background: #ccc; box-shadow: none; }
+
+    #status-msg {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 600;
+      min-height: 24px;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 50px 0;
+      color: var(--verde);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2><span id="icon">⚙️</span> Configuración de Horarios</h2>
+  
+  <div id="main-content">
+    <div class="loader">Cargando datos del Sheet...</div>
+  </div>
+
+  <button id="btnGuardar" class="btn-save" onclick="guardar()">💾 Guardar Cambios</button>
+  <div id="status-msg"></div>
+</div>
+
+<script>
+  // Al cargar la página, pedimos los datos al servidor (Código.gs)
+  window.onload = function() {
+    google.script.run
+      .withSuccessHandler(renderizar)
+      .withFailureHandler(err => {
+        document.getElementById('main-content').innerHTML = "Error: " + err;
+      })
+      .obtenerHorariosSheet();
+  };
+
+  function renderizar(datos) {
+    const content = document.getElementById('main-content');
+    if (typeof datos === 'string') { // Si devolvió un mensaje de error
+      content.innerHTML = `<p style="color:red; text-align:center;">${datos}</p>`;
+      return;
+    }
+
+    let html = "";
+    datos.forEach((h, index) => {
+      html += `
+        <div class="dia-card ${h.cerrado ? 'cerrado-active' : ''}" data-dia="${h.dia}">
+          <div class="header-fila">
+            <span class="nombre-dia">${h.dia}</span>
+            <label class="switch-container">
+              <input type="checkbox" class="check-cerrado" onchange="toggleDia(this)" ${h.cerrado ? 'checked' : ''}>
+              <span class="status-text" style="color: ${h.cerrado ? 'var(--rojo)' : 'var(--verde)'}">
+                ${h.cerrado ? 'CERRADO' : 'ABIERTO'}
+              </span>
+            </label>
+          </div>
+
+          <div class="horarios-grid">
+            <div class="bloque-turno">
+              <label>TURNO MAÑANA</label>
+              <div class="inputs-group">
+                <input type="text" class="m_i" value="${h.m_inicio}" placeholder="9:00" ${h.cerrado ? 'disabled' : ''}>
+                <span>-</span>
+                <input type="text" class="m_f" value="${h.m_fin}" placeholder="13:00" ${h.cerrado ? 'disabled' : ''}>
+              </div>
+            </div>
+            <div class="bloque-turno">
+              <label>TURNO TARDE</label>
+              <div class="inputs-group">
+                <input type="text" class="t_i" value="${h.t_inicio}" placeholder="17:00" ${h.cerrado ? 'disabled' : ''}>
+                <span>-</span>
+                <input type="text" class="t_f" value="${h.t_fin}" placeholder="23:00" ${h.cerrado ? 'disabled' : ''}>
+              </div>
+            </div>
+          </div>
+
+          <div class="motivo-container">
+            <label>AVISO O MOTIVO ESPECIAL:</label>
+            <input type="text" class="motivo-input" value="${h.motivo || ''}" placeholder="Ej: Abierto horario corrido por feriado">
+          </div>
+        </div>
+      `;
+    });
+    content.innerHTML = html;
+  }
+
+  // Activa/Desactiva visualmente los campos al marcar "Cerrado"
+  function toggleDia(checkbox) {
+    const card = checkbox.closest('.dia-card');
+    const inputs = card.querySelectorAll('.horarios-grid input');
+    const statusText = card.querySelector('.status-text');
+    
+    if (checkbox.checked) {
+      card.classList.add('cerrado-active');
+      statusText.innerText = "CERRADO";
+      statusText.style.color = "var(--rojo)";
+      inputs.forEach(i => i.disabled = true);
+    } else {
+      card.classList.remove('cerrado-active');
+      statusText.innerText = "ABIERTO";
+      statusText.style.color = "var(--verde)";
+      inputs.forEach(i => i.disabled = false);
+    }
+  }
+
+  // Recolecta los datos y los envía al Script
+  function guardar() {
+    const btn = document.getElementById('btnGuardar');
+    const msg = document.getElementById('status-msg');
+    
+    btn.disabled = true;
+    btn.innerText = "⌛ Guardando...";
+    msg.innerText = "";
+
+    const todasLasFilas = document.querySelectorAll('.dia-card');
+    const datosParaEnviar = Array.from(todasLasFilas).map(card => {
+      return {
+        dia: card.dataset.dia,
+        m_inicio: card.querySelector('.m_i').value,
+        m_fin: card.querySelector('.m_f').value,
+        t_inicio: card.querySelector('.t_i').value,
+        t_fin: card.querySelector('.t_f').value,
+        cerrado: card.querySelector('.check-cerrado').checked,
+        motivo: card.querySelector('.motivo-input').value
+      };
+    });
+
+    google.script.run
+      .withSuccessHandler(res => {
+        msg.innerHTML = `<span style="color:var(--verde)">${res}</span>`;
+        btn.disabled = false;
+        btn.innerText = "💾 Guardar Cambios";
+        // Limpiar mensaje después de 4 segundos
+        setTimeout(() => { msg.innerText = ""; }, 4000);
+      })
+      .withFailureHandler(err => {
+        msg.innerHTML = `<span style="color:var(--rojo)">Error: ${err}</span>`;
+        btn.disabled = false;
+        btn.innerText = "💾 Guardar Cambios";
+      })
+      .actualizarHorariosDesdePanel(datosParaEnviar);
+  }
+</script>
+
+</body>
+</html>
