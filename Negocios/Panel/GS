@@ -1,0 +1,228 @@
+// Variable global para acceder a la Hoja de Cálculo
+const SPREADSHEET_ID = "1D_wWxWG2ya37ENG_-7deFMgSVKQruExp4Q_Ji93GcRI"; 
+
+// Columnas definidas para el mapeo de datos
+const PRODUCT_HEADERS = ['id', 'nombre', 'precio', 'categoria', 'img', 'stock', 'promocion'];
+
+/**
+ * Función principal que maneja la carga de páginas y el login.
+ */
+function doGet(request) {
+    const action = request.parameter.action;
+    const negocioId = request.parameter.negocio_id;
+    
+    // --- 1. PROCESO DE LOGIN (Desde el formulario) ---
+    if (action === 'login') {
+        const user = request.parameter.username;
+        const pass = request.parameter.password;
+        
+        const validatedNegocioId = validateCredentials(user, pass);
+        
+        if (validatedNegocioId) {
+            // SI EL LOGIN ES EXITOSO, CARGAMOS EL PANEL DIRECTAMENTE
+            const template = HtmlService.createTemplateFromFile('panel');
+            template.negocio_id = validatedNegocioId; // Pasamos el ID al HTML
+            
+            return template.evaluate()
+                .setTitle('Panel de Control')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        } else {
+            // Login fallido
+            const template = HtmlService.createTemplateFromFile('login');
+            template.error_message = 'Usuario o contraseña incorrectos.';
+            return template.evaluate()
+                .setTitle('Login de Negocios')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        }
+    }
+
+    // --- 2. CARGA DEL PANEL DIRECTA (Si se accede por URL con parámetros) ---
+    if (request.parameter.page === 'panel' && negocioId) {
+        const template = HtmlService.createTemplateFromFile('panel');
+        template.negocio_id = negocioId;
+        
+        return template.evaluate()
+            .setTitle('Panel de Control')
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    } 
+    
+    // --- 3. CARGA INICIAL (Login por defecto) ---
+    const template = HtmlService.createTemplateFromFile('login');
+    template.error_message = '';
+    return template.evaluate()
+        .setTitle('Login de Negocios')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Valida usuario y contraseña contra la hoja "usuarios".
+ */
+function validateCredentials(user, pass) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const usersSheet = ss.getSheetByName('usuarios');
+    if (!usersSheet) return null;
+
+    const data = usersSheet.getDataRange().getValues();
+    const headers = data[0]; 
+    const businessIdCol = headers.indexOf('negocio_id');
+    const userCol = headers.indexOf('usuario');
+    const passCol = headers.indexOf('contraseña');
+
+    if (businessIdCol === -1 || userCol === -1 || passCol === -1) return null;
+    
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[userCol] === user && row[passCol] === pass) {
+        return String(row[businessIdCol]); 
+      }
+    }
+    return null;
+  } catch (e) {
+    Logger.log('Error de validación: ' + e.toString());
+    return null;
+  }
+}
+
+/**
+ * Incluye un archivo HTML dentro de otro.
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+// ------------------------------------------------------------------------------------------------
+// --- FUNCIONES DE DATOS (RESTAURADAS COMPLETAS) ---
+// ------------------------------------------------------------------------------------------------
+
+/**
+ * Obtiene los productos.
+ */
+function getProductos(negocioId) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(negocioId);
+    
+    if (!sheet) {
+      return { success: false, error: `La hoja de productos "${negocioId}" no existe.` };
+    }
+    
+    const range = sheet.getDataRange();
+    const values = range.getValues();
+    
+    if (values.length <= 1) {
+        return { success: true, products: [] };
+    }
+    
+    const sheetHeaders = values[0].map(h => h.toLowerCase().replace(/ /g, '_'));
+    const products = [];
+    
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i];
+      let product = {};
+      
+      PRODUCT_HEADERS.forEach(key => {
+          const colIndex = sheetHeaders.indexOf(key);
+          product[key] = colIndex !== -1 ? row[colIndex] : '';
+      });
+
+      product.row = i + 1; 
+      products.push(product);
+    }
+    
+    return { success: true, products: products, headers: PRODUCT_HEADERS };
+    
+  } catch (e) {
+    return { success: false, error: 'Error al obtener productos: ' + e.toString() };
+  }
+}
+
+/**
+ * Guarda cambios en un producto.
+ */
+function guardarProducto(negocioId, rowNum, updatedData) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(negocioId);
+    
+    if (!sheet) {
+      return { success: false, error: `La hoja de productos "${negocioId}" no existe.` };
+    }
+    
+    const sheetHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(h => h.toLowerCase().replace(/ /g, '_'));
+    
+    for (const key in updatedData) {
+      if (updatedData.hasOwnProperty(key)) {
+        const colIndex = sheetHeaders.indexOf(key);
+        
+        if (colIndex !== -1) {
+          sheet.getRange(rowNum, colIndex + 1).setValue(updatedData[key]);
+        }
+      }
+    }
+    
+    return { success: true };
+    
+  } catch (e) {
+    return { success: false, error: 'Error al guardar el producto: ' + e.toString() };
+  }
+}
+
+/**
+ * Agrega un nuevo producto.
+ */
+function agregarProducto(negocioId, newProduct) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(negocioId);
+    
+    if (!sheet) {
+      return { success: false, error: `La hoja de productos "${negocioId}" no existe.` };
+    }
+    
+    if (sheet.getLastRow() === 0 || sheet.getRange(1, 1).isBlank()) {
+        const headersToCreate = PRODUCT_HEADERS.map(h => h.toUpperCase());
+        sheet.appendRow(headersToCreate);
+    }
+    
+    const lastCol = sheet.getLastColumn();
+    const sheetHeaders = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => h.toLowerCase().replace(/ /g, '_'));
+    const newRow = [];
+    
+    sheetHeaders.forEach(key => {
+        newRow.push(newProduct[key] !== undefined ? newProduct[key] : ''); 
+    });
+    
+    sheet.appendRow(newRow);
+    const newRowNum = sheet.getLastRow();
+    
+    return { success: true, newRow: newRowNum, headers: PRODUCT_HEADERS };
+    
+  } catch (e) {
+    return { success: false, error: 'Error al agregar el producto (SERVIDOR): ' + e.toString() };
+  }
+}
+
+/**
+ * Elimina un producto.
+ */
+function eliminarProducto(negocioId, rowNum) {
+    try {
+        if (rowNum <= 1) { 
+            return { success: false, error: 'No se puede eliminar la fila de encabezados.' };
+        }
+
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const sheet = ss.getSheetByName(negocioId);
+        
+        if (!sheet) {
+            return { success: false, error: `La hoja de productos "${negocioId}" no existe.` };
+        }
+        
+        sheet.deleteRow(rowNum);
+        
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: 'Error al eliminar el producto: ' + e.toString() };
+    }
+}
