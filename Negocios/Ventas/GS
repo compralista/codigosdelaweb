@@ -1,0 +1,33 @@
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.openById("1eN5EXBBT1PMMFAcAYzb_osiv2zTyyuIJKhOxDv2Ntec");
+    var sheet = ss.getSheetByName("verduleria_elfresquito1");
+
+    var data = JSON.parse(e.postData.contents);
+
+    if(!data.nombre_cliente || !data.celular_cliente || !data.detalle_compra || !data.total){
+      return ContentService.createTextOutput(JSON.stringify({ok:false, error:"Faltan datos"}))
+                           .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ID: máximo de la columna A + 1
+    var lastRow = sheet.getLastRow();
+    var ids = lastRow > 1 ? sheet.getRange(2,1,lastRow-1,1).getValues().flat() : [];
+    var newId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
+
+    var fecha = new Date();
+
+    // Agregar al final
+    sheet.appendRow([newId, fecha, data.total, data.detalle_compra, data.nombre_cliente, data.celular_cliente]);
+
+    // Dar formato fecha + hora
+    sheet.getRange(sheet.getLastRow(), 2).setNumberFormat("dd/MM/yyyy HH:mm:ss");
+
+    return ContentService.createTextOutput(JSON.stringify({ok:true, id:newId}))
+                         .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false, error: err.message}))
+                         .setMimeType(ContentService.MimeType.JSON);
+  }
+}
