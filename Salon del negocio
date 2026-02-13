@@ -2,21 +2,26 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Verdulería "El Fresquito" - Pedidos Online</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 /* --- 🎨 Variables y Estilos Generales --- */
 :root {
+    /* Paleta Clara (Default) */
     --verde-fresco: #4CAF50;
     --verde-oscuro: #2E7D32;
     --verde-claro-bg: #E8F5E9;
     --naranja-acento: #FF9800;
     --rojo-cerrado: #E53935;
+    
     --texto-principal: #37474F;
     --texto-secundario: #546E7A;
+    --bg-body: #f4f7f6;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --borde-color: #e0e0e0;
     
-    /* Sistema de Sombras Moderno */
     --sombra-sutil: 0 2px 5px rgba(0,0,0,0.05);
     --sombra-media: 0 5px 15px rgba(0,0,0,0.08);
     --sombra-flotante: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
@@ -24,18 +29,44 @@
     --radio-borde: 16px;
 }
 
+/* --- 🌙 Variables Modo Oscuro --- */
+body.dark-mode {
+    --verde-fresco: #66BB6A; /* Verde más brillante para fondo oscuro */
+    --verde-oscuro: #A5D6A7; /* Texto verde más claro */
+    --verde-claro-bg: #1B2E1C; /* Fondo verde muy oscuro */
+    
+    --texto-principal: #E0E0E0;
+    --texto-secundario: #B0BEC5;
+    --bg-body: #121212;
+    --bg-card: #1E1E1E;
+    --bg-input: #2C2C2C;
+    --borde-color: #333333;
+    
+    --sombra-sutil: 0 2px 5px rgba(0,0,0,0.3);
+    --sombra-media: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
 body { 
     font-family: 'Roboto', sans-serif; 
     margin: 0; 
-    background-color: #f4f7f6;
-    background-image: linear-gradient(to bottom, var(--verde-claro-bg) 0%, #f4f7f6 300px);
+    background-color: var(--bg-body);
+    /* Gradiente sutil adaptable */
+    background-image: linear-gradient(to bottom, var(--verde-claro-bg) 0%, var(--bg-body) 400px);
+    background-attachment: fixed;
     color: var(--texto-principal);
     line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* --- Header --- */
 header { 
-    background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-fresco));
+    background: linear-gradient(135deg, #2E7D32, #4CAF50); /* Mantenemos marca siempre verde */
     color: white; 
     display: flex; 
     justify-content: space-between; 
@@ -47,31 +78,26 @@ header {
     z-index: 50;
 }
 
-/* --- ESTILOS NUEVOS PARA EL LOGO --- */
 .marca-container {
     display: flex;
     align-items: center;
-    gap: 15px; /* Espacio entre logo y texto */
+    gap: 15px;
 }
 
 .logo-negocio {
-    height: 60px; /* Tamaño del logo */
-    width: auto;
-    object-fit: contain;
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     transition: transform 0.3s ease;
-    background: white; /* Fondo blanco opcional para resaltar */
+    background: white;
     border-radius: 50%;
     padding: 2px;
 }
 
-.logo-negocio:hover {
-    transform: scale(1.05) rotate(-3deg);
-}
-
 header h1 { 
     margin: 0; 
-    font-size: 2rem; 
+    font-size: 1.8rem; 
     font-family: 'Poppins', sans-serif; 
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
@@ -84,18 +110,18 @@ header h1 {
     gap: 20px;
 }
 
-/* Indicador de Estado */
 .estado-local {
     padding: 8px 16px;
     border-radius: 30px;
     font-weight: 700;
     font-size: 0.95rem;
-    color: var(--verde-oscuro);
+    color: #2E7D32; /* Siempre verde oscuro dentro del badge blanco */
     background: rgba(255,255,255,0.95);
     display: inline-flex;
     align-items: center;
     box-shadow: var(--sombra-sutil);
     border: 2px solid transparent;
+    white-space: nowrap;
 }
 .estado-local.cerrado {
     color: var(--rojo-cerrado);
@@ -103,7 +129,6 @@ header h1 {
     border-color: var(--rojo-cerrado);
 }
 
-/* Botones del header */
 .btn-header { 
     border: none; 
     padding: 10px 22px; 
@@ -115,18 +140,15 @@ header h1 {
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+    font-size: 1rem;
 }
-.btn-header:active { transform: scale(0.95); }
 
 .btn-horarios {
     background: rgba(255,255,255,0.2);
     color: white;
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255,255,255,0.4);
-}
-.btn-horarios:hover { 
-    background: rgba(255,255,255,0.35); 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .btn-carrito { 
@@ -136,12 +158,10 @@ header h1 {
 }
 .btn-carrito:hover { 
     background: #F57C00; 
-    box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4); 
     transform: translateY(-2px);
 }
-.btn-carrito.deshabilitado {
-    background: #cfd8dc; color: #78909c; box-shadow: none; cursor: not-allowed; opacity: 1;
-}
+.btn-carrito.pop { animation: pop 0.3s ease; }
+@keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
 .btn-carrito span { 
     font-weight: 800;
@@ -158,12 +178,13 @@ header h1 {
     margin: 40px auto; 
     max-width: 1200px; 
     padding: 0 25px;
+    align-items: flex-start;
 }
 
 /* Sidebar Categorías */
-.categorias { 
+.categorias-sidebar { 
     flex: 0 0 240px; 
-    background: white; 
+    background: var(--bg-card); 
     padding: 25px; 
     border-radius: var(--radio-borde); 
     box-shadow: var(--sombra-media);
@@ -172,7 +193,7 @@ header h1 {
     top: 100px; 
     border: 1px solid rgba(0,0,0,0.04);
 }
-.categorias h2 { 
+.categorias-sidebar h2 { 
     margin-top: 0; 
     color: var(--verde-oscuro); 
     font-family: 'Poppins', sans-serif;
@@ -181,9 +202,9 @@ header h1 {
     margin-bottom: 15px;
     font-size: 1.3rem;
 }
-.categorias ul { list-style: none; padding: 0; margin: 0;}
-.categorias li { margin-bottom: 8px; }
-.categorias li a { 
+.categorias-sidebar ul { list-style: none; padding: 0; margin: 0;}
+.categorias-sidebar li { margin-bottom: 8px; }
+.categorias-sidebar li a { 
     display: block; 
     padding: 12px 18px; 
     text-decoration: none; 
@@ -192,27 +213,88 @@ header h1 {
     transition: all 0.2s ease;
     font-weight: 500;
 }
-.categorias li a:hover { 
+.categorias-sidebar li a:hover { 
     background: var(--verde-claro-bg); 
-    color: var(--verde-oscuro);
+    color: var(--verde-oscuro); /* En dark mode usa el verde claro */
     transform: translateX(5px);
 }
-.categorias li a.activo { 
+.categorias-sidebar li a.activo { 
     background: var(--verde-fresco); 
-    color: white;
+    color: white; /* Siempre blanco en activo */
     font-weight: 600;
     box-shadow: var(--sombra-sutil);
 }
+body.dark-mode .categorias-sidebar li a.activo { color: #121212; font-weight: 700; } 
 
 /* Área de Productos */
-.productos-lista { flex: 1; min-width: 300px; }
-.productos-lista h2 {
+.productos-lista { flex: 1; min-width: 0; }
+
+.header-filtros {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-sutil);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.titulo-seccion {
     font-family: 'Poppins', sans-serif;
     color: var(--verde-oscuro);
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-    border-left: 5px solid var(--naranja-acento);
-    padding-left: 15px;
+    font-size: 1.5rem;
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* --- Contenedor de Filtros --- */
+.controles-filtros {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.select-categoria {
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 2px solid var(--borde-color);
+    background-color: var(--bg-input);
+    font-family: 'Poppins', sans-serif;
+    color: var(--texto-principal);
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+    min-width: 180px;
+    appearance: none; 
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234CAF50%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+    width: auto;
+}
+.select-categoria:focus {
+    border-color: var(--verde-fresco);
+}
+
+.buscador-input {
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 2px solid var(--borde-color);
+    background-color: var(--bg-input);
+    color: var(--texto-principal);
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    width: 200px;
+    transition: all 0.3s;
+}
+.buscador-input:focus {
+    border-color: var(--verde-fresco);
+    width: 220px;
 }
 
 .grid-productos { 
@@ -223,7 +305,7 @@ header h1 {
 
 /* --- Tarjeta Producto --- */
 .producto-card { 
-    background: white; 
+    background: var(--bg-card); 
     border-radius: var(--radio-borde);
     padding: 25px; 
     text-align: center; 
@@ -231,7 +313,6 @@ header h1 {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     overflow: hidden;
-    border: 1px solid transparent;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -239,14 +320,13 @@ header h1 {
 .producto-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--sombra-flotante);
-    border-color: var(--verde-claro-bg);
 }
 
 .producto-card .cinta-oferta {
     position: absolute;
     top: 12px; left: -32px;
     background: linear-gradient(45deg, var(--naranja-acento), #FFC107);
-    color: var(--texto-principal);
+    color: #37474F; /* Siempre oscuro para contraste */
     font-weight: 800;
     text-transform: uppercase;
     padding: 8px 45px;
@@ -258,19 +338,13 @@ header h1 {
 
 .producto-card img {
     max-width: 100%; 
-    height: 140px; /* Altura fija para uniformidad */
+    height: 140px; 
     object-fit: contain;
-    margin-bottom: 20px;
-    display: block; margin: 0 auto 20px;
+    margin: 0 auto 20px;
+    display: block;
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
-    transition: transform 0.3s;
 }
-.producto-card:hover img { transform: scale(1.08); }
-
-/* Estilo especial cuando NO hay imagen */
-.producto-card.sin-imagen {
-    padding-top: 40px; /* Un poco más de aire arriba */
-}
+.producto-card.sin-imagen { padding-top: 40px; }
 
 .producto-card h3 { 
     font-size: 1.15rem; margin: 10px 0; font-weight: 600; min-height: 45px; 
@@ -291,189 +365,201 @@ header h1 {
     cursor: pointer; 
     font-weight: 700;
     font-family: 'Poppins', sans-serif;
-    transition: all 0.2s;
     width: 100%; 
     text-transform: uppercase;
     box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2);
+    font-size: 1rem;
 }
-.producto-card .btn-agregar:disabled {
-    background: #CFD8DC; color: #90A4AE; box-shadow: none; cursor: not-allowed;
-}
-.producto-card .btn-agregar:hover:not(:disabled) { 
-    background: var(--verde-oscuro); 
-    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.3);
-}
+body.dark-mode .producto-card .btn-agregar { color: #121212; } /* Texto negro en boton verde claro */
 
-/* --- Modales (RESTAURADOS COMPLETOS) --- */
+.producto-card .btn-agregar:disabled { background: #CFD8DC; color: #90A4AE; box-shadow: none; cursor: not-allowed; }
+body.dark-mode .producto-card .btn-agregar:disabled { background: #424242; color: #757575; }
+
+.producto-card .btn-agregar:hover:not(:disabled) { background: var(--verde-oscuro); box-shadow: 0 6px 12px rgba(46, 125, 50, 0.3); }
+
+/* --- Modales --- */
 .modal-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
-    backdrop-filter: blur(5px); /* Efecto borroso de fondo */
+    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
     display: flex; justify-content: center; align-items: center; 
     visibility: hidden; opacity: 0; transition: all 0.3s ease; 
     z-index: 1000; 
 }
-.modal-overlay.visible { 
-    visibility: visible; opacity: 1; 
-}
-
+.modal-overlay.visible { visibility: visible; opacity: 1; }
 .modal-content { 
-    background: white; padding: 40px; 
-    border-radius: 24px; 
-    width: 90%; max-width: 500px; 
-    max-height: 90vh; overflow-y: auto; 
-    position: relative; 
-    transform: scale(0.9); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: var(--sombra-flotante);
+    background: var(--bg-card); padding: 30px; border-radius: 24px; 
+    width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; 
+    transform: scale(0.9); transition: all 0.3s;
+    box-shadow: var(--sombra-flotante); position: relative;
+    color: var(--texto-principal);
 }
-.modal-overlay.visible .modal-content { 
-    transform: scale(1); 
-}
+.modal-overlay.visible .modal-content { transform: scale(1); }
+.modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2rem; cursor: pointer; color: #90A4AE; line-height: 1;}
 
-.modal-close { 
-    position: absolute; top: 20px; right: 25px; 
-    background: none; border: none; 
-    font-size: 2rem; cursor: pointer; color: #90A4AE;
-    transition: color 0.2s;
-}
-.modal-close:hover { color: var(--rojo-cerrado); }
+/* --- Lista Horarios --- */
+.lista-horarios { list-style: none; padding: 0; margin: 10px 0 0 0; display: flex; flex-direction: column; gap: 8px;}
 
-.modal-content h2 {
-    font-family: 'Poppins', sans-serif;
-    color: var(--verde-oscuro);
-    text-align: center; margin-bottom: 25px;
-    margin-top: 0;
-}
-
-/* Modal Horarios */
-.lista-horarios {
-    list-style: none; padding: 0; margin: 0;
-}
-.lista-horarios li {
-    padding: 14px 10px;
-    border-bottom: 1px solid #f0f0f0;
-    color: var(--texto-secundario);
-    display: flex; justify-content: space-between;
-}
-.lista-horarios li:last-child { border-bottom: none; }
-.lista-horarios li.dia-actual {
-    background-color: var(--verde-claro-bg);
-    color: var(--verde-oscuro);
-    border-radius: 10px;
-    border-bottom: none;
-    font-weight: 600;
-}
-.loading-horarios {
-    text-align: center; color: #888; padding: 20px; font-style: italic;
-}
-
-/* --- Carrito Modal --- */
-.modal-carrito-item { 
-    display: flex; justify-content: space-between; align-items: center; 
-    margin-bottom: 20px; padding-bottom: 15px; 
-    border-bottom: 1px solid #f0f0f0; 
-    font-weight: 500;
-}
-.modal-carrito-item:last-child { border-bottom: none; margin-bottom: 0; }
-
-.controles-cantidad { 
-    display: flex; align-items: center; gap: 10px; 
-}
-.controles-cantidad .btn-cantidad { 
-    background: #f5f5f5; border: 1px solid #e0e0e0;
-    width: 32px; height: 32px; border-radius: 50%; 
-    cursor: pointer; font-size: 1.2rem; font-weight: bold; 
-    color: var(--verde-oscuro); transition: background 0.2s;
-    display: flex; align-items: center; justify-content: center;
-}
-.controles-cantidad .btn-cantidad:hover { background: var(--verde-claro-bg); border-color: var(--verde-fresco); }
-.controles-cantidad span { margin: 0 5px; font-weight: 600; font-size: 1.1rem;}
-
-#modal-total { color: var(--verde-oscuro); font-size: 1.4rem; font-weight: 800; }
-
-#form-cliente label {
-    display: block; margin-bottom: 8px;
-    font-weight: 600; color: var(--texto-secundario); font-size: 0.9rem;
-}
-#form-cliente input { 
-    width: 100%; padding: 14px; box-sizing: border-box;
-    margin-bottom: 20px; 
-    border: 2px solid #eee; 
+.lista-horarios li { 
+    display: grid; 
+    grid-template-columns: 120px 1fr; 
+    align-items: center;
+    padding: 12px 15px; 
     border-radius: 12px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-#form-cliente input:focus {
-    outline: none;
-    border-color: var(--verde-fresco);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    background-color: var(--bg-body); /* Adaptable */
+    border: 1px solid var(--borde-color);
+    transition: all 0.2s;
 }
 
-.btn-whatsapp { 
-    background: #25D366; color: white; padding: 16px; font-size: 1.1rem; 
-    margin-top: 10px; border-radius: 50px; width: 100%; border: none; 
-    cursor: pointer; font-weight: 700; 
-    font-family: 'Poppins', sans-serif;
-    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-    transition: all 0.3s;
-}
-.btn-whatsapp:hover { background: #128C7E; box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4); transform: translateY(-2px); }
-
-/* Mensajes y Toast */
-#loading, #error-msg { 
-    font-size: 1.1rem; padding: 25px; 
-    background: #FFF3E0; color: #E65100;
-    border-radius: 12px; text-align: center; margin-top: 30px; display: none; 
-    box-shadow: var(--sombra-sutil);
-    border: none;
-    font-weight: 500;
-}
-#error-msg { background: #FFEBEE; color: #C62828; }
-
-#toast { 
-    position: fixed; bottom: 30px; right: 30px;
-    background: rgba(46, 125, 50, 0.95);
-    backdrop-filter: blur(10px);
-    color: white; 
-    padding: 16px 30px; 
-    border-radius: 50px; 
-    box-shadow: var(--sombra-flotante);
-    font-family: 'Poppins', sans-serif;
+.horario-dia {
     font-weight: 600;
-    opacity: 0; visibility: hidden;
-    transition: all 0.3s; z-index: 1001;
-    transform: translateY(20px);
+    color: var(--texto-secundario);
+    text-transform: capitalize;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    display: flex; align-items: center; gap: 5px;
 }
+.horario-hora {
+    font-size: 0.95rem;
+    color: var(--texto-principal);
+    line-height: 1.4;
+}
+.lista-horarios li.dia-actual { 
+    background-color: var(--verde-claro-bg); 
+    border-color: var(--verde-fresco);
+    box-shadow: var(--sombra-sutil);
+}
+.lista-horarios li.dia-actual .horario-dia {
+    color: var(--verde-oscuro);
+    font-weight: 700;
+}
+.badge-hoy {
+    font-size: 0.7rem;
+    background: var(--verde-fresco);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 5px;
+    text-transform: uppercase;
+}
+body.dark-mode .badge-hoy { color: #121212; }
+
+.modal-carrito-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--borde-color); }
+.controles-cantidad { display: flex; align-items: center; gap: 8px; }
+.controles-cantidad .btn-cantidad { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 1px solid var(--borde-color); background: var(--bg-input); color: var(--texto-principal);}
+
+#form-cliente input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--borde-color); border-radius: 12px; box-sizing: border-box; background: var(--bg-input); color: var(--texto-principal);}
+.btn-whatsapp { background: #25D366; color: white; padding: 16px; width: 100%; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 1.1rem; display: flex; justify-content: center; gap: 10px; align-items: center;}
+.btn-vaciar { background: none; border: none; color: #E53935; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+
+#toast { position: fixed; bottom: 30px; right: 30px; background: rgba(46, 125, 50, 0.95); color: white; padding: 16px 30px; border-radius: 50px; font-weight: 600; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 1001; transform: translateY(20px); }
 #toast.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
-/* Responsive */
-@media (max-width: 768px) {
-    header { padding: 15px; flex-direction: column; gap: 15px;}
-    .header-controles { width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px; }
-    .btn-header { flex-grow: 1; justify-content: center; padding: 12px; font-size: 0.9rem;}
-    
-    /* Ajustes logo en movil */
-    .marca-container { flex-direction: column; gap: 10px; margin-bottom: 5px; }
-    header h1 { font-size: 1.6rem; text-align: center; }
-    .logo-negocio { height: 75px; }
+/* --- 🔧 BOTONES FLOTANTES DISCRETOS --- */
+.utilidades-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 900;
+}
 
-    .tienda-container { flex-direction: column; margin: 20px auto; padding: 0 15px; gap: 25px;}
-    .categorias { width: auto; position: relative; top: 0; padding: 20px;}
-    .categorias ul { display: flex; flex-wrap: wrap; gap: 8px; }
-    .categorias li { margin-bottom: 0; flex-grow: 1; }
-    .categorias li a { text-align: center; padding: 10px; font-size: 0.9rem; border-radius: 30px;}
+.btn-flotante {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6); /* Oscuro semitransparente */
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* En modo oscuro, botones blancos semitransparentes */
+body.dark-mode .btn-flotante {
+    background: rgba(255,255,255,0.2); 
+    color: white;
+}
+
+.btn-flotante:hover {
+    transform: scale(1.1);
+    background: var(--verde-fresco); /* Al hacer hover se pone verde marca */
+    opacity: 1;
+}
+
+/* --- RESPONSIVE OPTIMIZADO PARA MÓVILES (CORREGIDO) --- */
+@media (max-width: 768px) {
+    body { font-size: 14px; }
+    .categorias-sidebar { display: none; }
     
-    .grid-productos { 
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    header { padding: 10px 15px; flex-direction: column; gap: 10px;}
+    .logo-negocio { width: 45px; height: 45px; } 
+    header h1 { font-size: 1.3rem; margin-left: 5px; text-align: center;}
+    
+    .header-controles { width: 100%; justify-content: center; flex-wrap: wrap; gap: 8px; }
+    .btn-header { flex-grow: 1; justify-content: center; padding: 8px 12px; font-size: 0.85rem; }
+    .estado-local { padding: 5px 12px; font-size: 0.8rem; }
+    
+    .tienda-container { flex-direction: column; margin: 15px auto; padding: 0 10px; gap: 15px;}
+
+    /* --- FILTROS Y BUSCADOR FULL WIDTH --- */
+    .header-filtros { 
+        padding: 15px; 
         gap: 15px; 
+        flex-direction: column; /* Apila título y controles */
+        align-items: stretch;   /* Estira los elementos */
     }
-    .producto-card { padding: 20px 15px; }
-    .producto-card h3 { font-size: 1rem; min-height: 40px;}
-    .producto-card .precio { font-size: 1.3rem; }
-    .producto-card img { height: 120px; }
     
-    .modal-content { padding: 25px; width: 90%;}
+    .titulo-seccion { 
+        text-align: center; 
+        font-size: 1.2rem; 
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .controles-filtros { 
+        display: flex;
+        flex-direction: column; /* Pone el select arriba y buscador abajo */
+        gap: 10px; 
+        width: 100%; 
+    }
+    
+    .select-categoria, .buscador-input { 
+        padding: 10px 15px; 
+        height: 45px; /* Más alto para dedo */
+        font-size: 0.95rem; 
+        width: 100% !important;     /* FUERZA el ancho total */
+        min-width: 0 !important;    /* Resetea el ancho mínimo de PC */
+        max-width: none;
+        margin: 0;
+    }
+
+    /* Evitar que el buscador se deforme al escribir en celular */
+    .buscador-input:focus {
+        width: 100% !important;
+    }
+    /* ------------------------------------ */
+
+    .grid-productos { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    
+    .producto-card { padding: 12px; }
+    .producto-card img { height: 100px; margin-bottom: 10px; }
+    .producto-card h3 { font-size: 0.95rem; min-height: 35px; margin: 5px 0; line-height: 1.2; }
+    .producto-card .precio { font-size: 1.1rem; margin-bottom: 10px; }
+    .producto-card .btn-agregar { padding: 8px 10px; font-size: 0.85rem; }
+    .producto-card .cinta-oferta { font-size: 0.6rem; padding: 5px 40px; top: 10px; left: -35px; }
+
+    .modal-content { padding: 20px; width: 95%; }
+    
+    .utilidades-container { bottom: 15px; left: 15px; gap: 10px; }
+    .btn-flotante { width: 35px; height: 35px; font-size: 1rem; }
 }
 </style>
 </head>
@@ -486,68 +572,73 @@ header h1 {
     </div>
     
     <div class="header-controles">
-        <div id="indicador-estado" class="estado-local">
-            Cargando...
-        </div>
-
-        <button id="btn-abrir-horarios" class="btn-header btn-horarios">
-            📅 Horarios
-        </button>
-
-        <button id="btn-ver-carrito" class="btn-header btn-carrito">
-            🛒 Carrito (<span id="total-header">$0.00</span>)
-        </button>
+        <div id="indicador-estado" class="estado-local">Cargando...</div>
+        <button id="btn-abrir-horarios" class="btn-header btn-horarios">📅 Horarios</button>
+        <button id="btn-ver-carrito" class="btn-header btn-carrito">🛒 Carrito (<span id="total-header">$0.00</span>)</button>
     </div>
 </header>
 
 <div class="tienda-container">
 
-    <nav class="categorias">
-        <h2>Buscar por Categoría</h2>
-        <ul id="categorias-lista"></ul>
+    <nav class="categorias-sidebar">
+        <h2>Categorías</h2>
+        <ul id="categorias-lista">
+            </ul>
     </nav>
 
     <main class="productos-lista">
-        <h2>Ofertas y Productos</h2>
-        <div id="loading">Cargando productos... por favor espera.</div>
-        <div id="error-msg" style="display:none;">⚠️ No pudimos cargar los productos remotos. Intenta más tarde o contáctanos.</div>
+        <div class="header-filtros">
+            <h2 class="titulo-seccion">Productos</h2>
+            
+            <div class="controles-filtros">
+                <select id="select-categoria" class="select-categoria">
+                    <option value="todos">Todas las categorías</option>
+                </select>
+
+                <input type="text" id="buscador" class="buscador-input" placeholder="Buscar producto...">
+            </div>
+        </div>
+
+        <div id="loading" style="text-align:center; padding:20px; font-weight:bold; color:#666;">Cargando productos...</div>
+        <div id="error-msg" style="display:none; text-align:center; padding:20px; background:#FFEBEE; color:red; border-radius:10px;">⚠️ Error de conexión.</div>
         <div id="productos-container" class="grid-productos"></div>
     </main>
 
 </div>
 
+<div class="utilidades-container">
+    <button id="btn-toggle-tema" class="btn-flotante" title="Cambiar Tema (Día/Noche)">🌙</button>
+    <button id="btn-compartir" class="btn-flotante" title="Compartir Negocio">🔗</button>
+</div>
+
 <div id="modal-horarios" class="modal-overlay">
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content" style="max-width: 420px;">
         <button class="modal-close" id="btn-cerrar-horarios">×</button>
-        <h2 style="text-align: center; color: var(--verde-oscuro);">Nuestros Horarios</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;">Te esperamos en los siguientes horarios:</p>
+        <h2 style="text-align:center; color:var(--verde-oscuro); margin-bottom: 20px;">Horarios de Atención</h2>
         
         <ul class="lista-horarios" id="lista-horarios-dinamica">
-             <li class="loading-horarios">Cargando horarios desde la sucursal...</li>
+             <li style="display:block; text-align: center; color: #888; padding: 20px;">Cargando horarios desde la sucursal...</li>
         </ul>
 
-        <button onclick="document.getElementById('modal-horarios').classList.remove('visible')" class="btn-header btn-carrito" style="margin: 20px auto 0; display:block;">Entendido</button>
     </div>
 </div>
 
 <div id="modal-carrito" class="modal-overlay">
     <div class="modal-content">
         <button class="modal-close" id="btn-cerrar-modal">×</button>
-        <h2>Detalle del Pedido</h2>
+        <h2>Tu Pedido</h2>
         <div id="modal-carrito-items"></div>
-        <div style="border-top: 2px dashed #eee; margin-top: 15px; padding-top: 15px; text-align:right;">
+        <div style="border-top:1px dashed #ccc; margin-top:15px; padding-top:15px; display:flex; justify-content:space-between; align-items:center;">
+             <button id="btn-vaciar-carrito" class="btn-vaciar" style="display:none;">Vaciar Carrito</button>
             <h3 style="margin:0;">Total: <span id="modal-total">$0.00</span></h3>
         </div>
-        
-        <div style="background: #fafafa; padding: 20px; border-radius: 15px; margin-top: 20px;">
-            <h2 style="font-size: 1.2rem; margin-bottom: 15px;">Datos de Contacto</h2>
+        <div style="background: var(--bg-body); padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px solid var(--borde-color);">
+            <h2 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--verde-oscuro);">Envío</h2>
             <form id="form-cliente">
-                <label for="nombre">Nombre y Apellido:</label>
-                <input type="text" id="nombre" placeholder="Tu nombre" required>
-                <label for="celular">Celular (WhatsApp):</label>
-                <input type="tel" id="celular" placeholder="Ej: 5491122334455" required>
+                <input type="text" id="nombre" placeholder="Nombre completo" required>
+                <input type="tel" id="celular" placeholder="WhatsApp (ej: 2664...)" required>
             </form>
-            <button id="btn-enviar-pedido" class="btn-whatsapp">✅ Enviar Pedido por WhatsApp</button>
+            <button id="btn-enviar-pedido" class="btn-whatsapp">Enviar a WhatsApp</button>
         </div>
     </div>
 </div>
@@ -560,30 +651,39 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- CONFIGURACIÓN DE URLS ---
 const params = new URLSearchParams(window.location.search);
 const negocioActual = params.get('negocio') || 'verduleria_elfresquito1';
-
-// URL del Apps Script de Productos (GET)
-const URL_SHEET_PRODUCTS = `https://script.google.com/macros/s/AKfycbxmrdId2-DIUd1hZSsYAJ4lpalK6XFMeQPHySrHqGljo079iOV0yhJ_iPrz9DA0G--P/exec?negocio=${negocioActual}`;
-
-// URL del Apps Script de Registro (POST)
-const URL_SHEET_REGISTRO = 'https://script.google.com/macros/s/AKfycbyofyN54TXZd4nm5zzJ8gmNDO8aPZ8tdOddKMUQHq6Y4paFkl371zRlNekiOP2YG3S6Ow/exec';
-
-// NUEVA URL: Apps Script de Horarios
-const URL_SHEET_HORARIOS = 'https://script.google.com/macros/s/AKfycbxvNRdU68PnP3jInuC0yhMntW5BJm3_NtcHsMacCck2xRt1G2hcateos4ZQP_Yf3-Rr/exec';
-
 const WHATSAPP_NUMBER = '542664212722';
 
-// --- CONFIGURACIÓN DE APERTURA (Variable modificable) ---
-// Se inicializa vacío y se llena con el fetch
-let horariosActivos = {};
+// 1. Productos
+const URL_SHEET_PRODUCTS = `https://script.google.com/macros/s/AKfycbxmrdId2-DIUd1hZSsYAJ4lpalK6XFMeQPHySrHqGljo079iOV0yhJ_iPrz9DA0G--P/exec?negocio=${negocioActual}`;
+// 2. Registro de Ventas
+const URL_SHEET_REGISTRO = 'https://script.google.com/macros/s/AKfycbyofyN54TXZd4nm5zzJ8gmNDO8aPZ8tdOddKMUQHq6Y4paFkl371zRlNekiOP2YG3S6Ow/exec';
+// 3. Horarios
+const URL_SHEET_HORARIOS = 'https://script.google.com/macros/s/AKfycbxvNRdU68PnP3jInuC0yhMntW5BJm3_NtcHsMacCck2xRt1G2hcateos4ZQP_Yf3-Rr/exec';
 
-// --- Variables y Selectores ---
+const STORAGE_KEY = 'carrito_fresquito_v2';
+const THEME_KEY = 'fresquito_theme';
+
+// Variables de Estado
+let productos = [];
+let carrito = [];
+let negocioAbierto = false;
+let horariosActivos = {}; 
+
+// Mapa de días
+const mapDias = {
+    'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 
+    'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0
+};
+
+// DOM Elements
 const productosContainer = document.getElementById('productos-container');
 const categoriasLista = document.getElementById('categorias-lista');
+const selectCategoria = document.getElementById('select-categoria');
 const loading = document.getElementById('loading');
 const errorMsg = document.getElementById('error-msg');
 const modal = document.getElementById('modal-carrito');
 const modalHorarios = document.getElementById('modal-horarios');
-const listaHorariosUL = document.getElementById('lista-horarios-dinamica');
+const listaHorariosUL = document.getElementById('lista-horarios-dinamica'); 
 const modalCarritoItemsContainer = document.getElementById('modal-carrito-items');
 const totalHeader = document.getElementById('total-header');
 const modalTotal = document.getElementById('modal-total');
@@ -592,132 +692,139 @@ const formCliente = document.getElementById('form-cliente');
 const toast = document.getElementById('toast');
 const btnVerCarrito = document.getElementById('btn-ver-carrito');
 const indicadorEstado = document.getElementById('indicador-estado');
+const buscador = document.getElementById('buscador');
+const btnVaciar = document.getElementById('btn-vaciar-carrito');
 
-// Control de modales (Botones)
-const btnAbrirHorarios = document.getElementById('btn-abrir-horarios');
-const btnCerrarHorarios = document.getElementById('btn-cerrar-horarios');
-const btnCerrarCarrito = document.getElementById('btn-cerrar-modal');
+// Botones Flotantes
+const btnToggleTema = document.getElementById('btn-toggle-tema');
+const btnCompartir = document.getElementById('btn-compartir');
 
-// Eventos de apertura/cierre de modales
-btnAbrirHorarios.addEventListener('click', () => modalHorarios.classList.add('visible'));
-btnCerrarHorarios.addEventListener('click', () => modalHorarios.classList.remove('visible'));
-btnVerCarrito.addEventListener('click', () => modal.classList.add('visible'));
-btnCerrarCarrito.addEventListener('click', () => modal.classList.remove('visible'));
-
-let productos = [];
-let carrito = [];
-let negocioAbierto = false;
-
-// Fallback local
-const localProductos = [
-    { id: 1, nombre: 'Manzana Roja (kg)', precio: 1500, categoria: 'frutas', img: '', stock: 10, promocion: true },
-    { id: 2, nombre: 'Banana Madura (kg)', precio: 1200, categoria: 'frutas', img: '', stock: 5, promocion: false }
-];
-
-function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-const formatPrice = (price) => `$${Number(price).toFixed(2)}`;
-
-// --- Lógica de Estado y Horarios ---
-
-// Función auxiliar para parsear hora "HH:MM" a array [H, M]
+// Helpers
+const formatPrice = (p) => `$${Number(p).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3000); }
 function parsearHora(textoHora) {
     if(!textoHora) return [0,0];
     const partes = textoHora.toString().split(':');
     return [parseInt(partes[0]), parseInt(partes[1] || 0)];
 }
 
-// Mapa de días texto -> número JS
-const mapDias = {
-    'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 
-    'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0
-};
+// --- LOGICA DE TEMA OSCURO ---
+function aplicarTema(esOscuro) {
+    if(esOscuro) {
+        document.body.classList.add('dark-mode');
+        btnToggleTema.textContent = "☀️"; // Cambiar icono a sol
+    } else {
+        document.body.classList.remove('dark-mode');
+        btnToggleTema.textContent = "🌙"; // Cambiar icono a luna
+    }
+}
 
-// Función para cargar horarios desde Google Sheets
+// Cargar preferencia
+const temaGuardado = localStorage.getItem(THEME_KEY);
+if(temaGuardado === 'dark') {
+    aplicarTema(true);
+}
+
+btnToggleTema.addEventListener('click', () => {
+    const esOscuro = document.body.classList.toggle('dark-mode');
+    if(esOscuro) {
+        btnToggleTema.textContent = "☀️";
+        localStorage.setItem(THEME_KEY, 'dark');
+    } else {
+        btnToggleTema.textContent = "🌙";
+        localStorage.setItem(THEME_KEY, 'light');
+    }
+});
+
+// --- LOGICA COMPARTIR ---
+btnCompartir.addEventListener('click', async () => {
+    const shareData = {
+        title: 'Verdulería "El Fresquito"',
+        text: '¡Mirá los productos frescos que tiene El Fresquito! Pedi online:',
+        url: window.location.href
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            console.log('Error al compartir', err);
+        }
+    } else {
+        // Fallback para PC
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            showToast("🔗 ¡Enlace copiado!");
+        } catch (err) {
+            prompt("Copia este enlace para compartir:", window.location.href);
+        }
+    }
+});
+
+
+// --- LÓGICA DE HORARIOS DINÁMICA ---
 async function cargarHorariosRemotos() {
     try {
         const response = await fetch(URL_SHEET_HORARIOS);
         const data = await response.json();
         
-        // Limpiar lista visual
         listaHorariosUL.innerHTML = '';
-        horariosActivos = {}; // Reiniciar objeto lógico
+        horariosActivos = {};
 
-        // Se asume que el sheet devuelve un array de objetos o un objeto {horarios: [...]}
         let listaDatos = Array.isArray(data) ? data : (data.horarios || []);
 
         listaDatos.forEach(item => {
-            // 1. Obtener nombre del día y limpiarlo
             const diaRaw = item.dia || "";
             const diaIndex = mapDias[diaRaw.toLowerCase().trim()];
-            
             let textoVisual = "";
-            let rangosLogicos = []; // Aquí guardamos [9,0,13,0]
+            let rangosLogicos = []; 
             let partesTexto = [];
 
-            // 2. Revisar si está cerrado manualmente
             if (item.cerrado === true || String(item.cerrado).toUpperCase() === "SI" || String(item.cerrado).toUpperCase() === "TRUE") {
-                textoVisual = `<span style="color:var(--rojo-cerrado); font-weight:bold;">Cerrado</span>`;
-                
-                // --- CORRECCIÓN AQUÍ PARA EL MOTIVO ---
+                textoVisual = `<span style="color:var(--rojo-cerrado); font-weight:700; background:#FFEBEE; padding:2px 8px; border-radius:4px; font-size:0.85rem;">CERRADO</span>`;
                 const motivo = item.motivo ? String(item.motivo).trim() : "";
-                if(motivo.length > 0) {
-                     // Lo ponemos en un div con margen superior para que baje de renglón
-                     textoVisual += `<div style="font-size: 0.85rem; color: #E53935; font-style: italic; margin-top:4px;">(${motivo})</div>`;
-                }
-                // -------------------------------------
-
+                if(motivo.length > 0) textoVisual += `<div style="font-size: 0.8rem; color: #E53935; margin-top:4px;">${motivo}</div>`;
             } else {
-                // 3. Procesar turno mañana (m_inicio - m_fin)
                 if (item.m_inicio && item.m_fin && item.m_inicio.toString() !== "") {
-                    partesTexto.push(`${item.m_inicio} - ${item.m_fin}`);
+                    partesTexto.push(`${item.m_inicio} a ${item.m_fin}hs`);
                     rangosLogicos.push([...parsearHora(item.m_inicio), ...parsearHora(item.m_fin)]);
                 }
-                
-                // 4. Procesar turno tarde (t_inicio - t_fin)
                 if (item.t_inicio && item.t_fin && item.t_inicio.toString() !== "") {
-                    partesTexto.push(`${item.t_inicio} - ${item.t_fin}`);
+                    partesTexto.push(`${item.t_inicio} a ${item.t_fin}hs`);
                     rangosLogicos.push([...parsearHora(item.t_inicio), ...parsearHora(item.t_fin)]);
                 }
-
-                // Unir los textos
-                if (partesTexto.length > 0) {
-                    textoVisual = partesTexto.join(' y ');
-                } else {
-                    textoVisual = "Cerrado";
-                }
+                
+                textoVisual = partesTexto.length > 0 ? partesTexto.join('<br>') : "Cerrado";
             }
 
-            // 5. Renderizar en HTML
             const li = document.createElement('li');
             li.setAttribute('data-dia', diaIndex);
             
-            // Marcar el día de hoy
             const hoyIndex = new Date().getDay();
-            if(diaIndex === hoyIndex) li.classList.add('dia-actual');
+            let etiquetaHoy = "";
+            
+            if(diaIndex === hoyIndex) {
+                li.classList.add('dia-actual');
+                etiquetaHoy = `<span class="badge-hoy">HOY</span>`;
+            }
 
-            li.innerHTML = `<span>${diaRaw}</span> <span>${textoVisual}</span>`;
+            li.innerHTML = `
+                <div class="horario-dia">${diaRaw} ${etiquetaHoy}</div> 
+                <div class="horario-hora">${textoVisual}</div>
+            `;
             listaHorariosUL.appendChild(li);
 
-            // 6. Guardar en memoria para el semáforo
-            // Solo guardamos si NO está cerrado y tenemos rangos
-            const cerradoBooleano = (item.cerrado === true || String(item.cerrado).toUpperCase() === "SI" || String(item.cerrado).toUpperCase() === "TRUE");
-
+            const cerradoBooleano = (item.cerrado === true || String(item.cerrado).toUpperCase() === "SI");
             if (diaIndex !== undefined && !cerradoBooleano && rangosLogicos.length > 0) {
                 horariosActivos[diaIndex] = rangosLogicos;
             }
         });
 
-        // Una vez cargados, verificamos si está abierto ahora
         verificarEstadoNegocio();
 
     } catch (error) {
         console.error("Error cargando horarios:", error);
-        listaHorariosUL.innerHTML = '<li style="color:red">Error cargando horarios.</li>';
+        listaHorariosUL.innerHTML = '<li style="color:red; text-align:center; display:block;">Error al cargar horarios.</li>';
         horariosActivos = {};
         verificarEstadoNegocio();
     }
@@ -728,19 +835,34 @@ function verificarEstadoNegocio() {
     const diaSemana = ahora.getDay(); 
     const horaActual = ahora.getHours();
     const minActual = ahora.getMinutes();
-    const tiempoActual = horaActual * 60 + minActual; // Minutos totales desde las 00:00
+    const tiempoActual = horaActual * 60 + minActual;
 
-    // Usamos los horarios cargados dinámicamente
+    if(listaHorariosUL.children.length > 0) {
+        Array.from(listaHorariosUL.children).forEach(li => {
+            li.classList.remove('dia-actual');
+            const diaDiv = li.querySelector('.horario-dia');
+            if(diaDiv) {
+                const badge = diaDiv.querySelector('.badge-hoy');
+                if(badge) badge.remove();
+            }
+        });
+        const liHoy = listaHorariosUL.querySelector(`li[data-dia="${diaSemana}"]`);
+        if(liHoy) {
+            liHoy.classList.add('dia-actual');
+            const diaDiv = liHoy.querySelector('.horario-dia');
+            if(diaDiv && !diaDiv.querySelector('.badge-hoy')) {
+                 diaDiv.innerHTML += `<span class="badge-hoy">HOY</span>`;
+            }
+        }
+    }
+
     const rangosHoy = horariosActivos[diaSemana];
     let estaAbierto = false;
 
     if (rangosHoy && rangosHoy.length > 0) {
-        // rangosHoy es un array de arrays: [[9,0,13,0], [17,0,21,0]]
         for (let rango of rangosHoy) {
-            // rango formato: [horaInicio, minInicio, horaFin, minFin]
             const inicio = rango[0] * 60 + rango[1];
             const fin = rango[2] * 60 + rango[3];
-            
             if (tiempoActual >= inicio && tiempoActual < fin) {
                 estaAbierto = true;
                 break;
@@ -749,176 +871,157 @@ function verificarEstadoNegocio() {
     }
     
     negocioAbierto = estaAbierto;
-    actualizarInterfazSegunEstado();
-}
-
-function actualizarInterfazSegunEstado() {
+    
     if (negocioAbierto) {
         indicadorEstado.textContent = "🟢 Abierto";
         indicadorEstado.classList.remove('cerrado');
-        btnVerCarrito.disabled = false;
         btnVerCarrito.classList.remove('deshabilitado');
-        btnVerCarrito.title = "Ver Carrito";
     } else {
         indicadorEstado.textContent = "🔴 Cerrado";
         indicadorEstado.classList.add('cerrado');
-        btnVerCarrito.disabled = true;
-        btnVerCarrito.classList.add('deshabilitado');
-        btnVerCarrito.title = "Cerrado - No se pueden realizar pedidos.";
-        
-        // Opcional: Cerrar carrito si está abierto
-        if (modal.classList.contains('visible')) {
-             // modal.classList.remove('visible'); // Descomentar si quieres que cierre el modal
-             showToast("El negocio ha cerrado.");
-        }
     }
     actualizarBotonesProductos();
 }
 
 function actualizarBotonesProductos() {
-    const botonesAgregar = document.querySelectorAll('.btn-agregar');
-    botonesAgregar.forEach(btn => {
+    document.querySelectorAll('.btn-agregar').forEach(btn => {
         if(btn.closest('#modal-horarios')) return;
-        if (!negocioAbierto) {
-            btn.disabled = true;
-            btn.textContent = "Cerrado";
-        } else {
-            const idProd = btn.getAttribute('data-id');
-            const prod = productos.find(p => p.id == idProd);
-            if (prod) {
-                if (prod.stock > 0) {
-                    btn.disabled = false;
-                    btn.textContent = "🛒 Agregar";
-                } else {
-                    btn.disabled = true;
-                    btn.textContent = "Sin Stock";
-                }
-            }
-        }
+        const prod = productos.find(p => p.id == btn.dataset.id);
+        if(!negocioAbierto) { btn.disabled=true; btn.textContent="Cerrado"; }
+        else if(prod && prod.stock>0) { btn.disabled=false; btn.textContent="🛒 Agregar"; }
+        else { btn.disabled=true; btn.textContent="Sin Stock"; }
     });
 }
 
-// --- Carga de Productos ---
+// --- CARGA DE PRODUCTOS ---
 async function cargarProductosRemotos() {
     loading.style.display = 'block';
-    errorMsg.style.display = 'none';
     try {
         const resp = await fetch(URL_SHEET_PRODUCTS);
-        if (!resp.ok) throw new Error('HTTP error ' + resp.status);
         const data = await resp.json();
-        
-        if (data && data.ok && Array.isArray(data.productos)) {
+        if(data.ok && data.productos) {
             productos = data.productos.map(p => ({
-                id: Number(p.id) || Date.now() + Math.random(),
-                nombre: String(p.nombre || 'Sin nombre'),
-                precio: Number(p.precio) || 0,
-                categoria: String(p.categoria || 'otros').toLowerCase().trim(),
+                id: Number(p.id) || Date.now()+Math.random(),
+                nombre: p.nombre, precio: Number(p.precio),
+                categoria: (p.categoria || 'varios').toLowerCase().trim(),
                 img: (p.img && p.img.startsWith('http')) ? p.img : '',
-                stock: p.stock != null ? Number(p.stock) : 9999,
-                promocion: !!p.promocion
+                stock: p.stock!=null?Number(p.stock):999, promocion: !!p.promocion
             }));
-            if (!productos.length) throw new Error('No trajo productos.');
-        } else throw new Error('Respuesta inválida.');
+        } else throw new Error();
     } catch(e) {
-        console.error(e);
-        errorMsg.style.display = 'block';
-        productos = localProductos; 
+        errorMsg.style.display='block';
+        productos = [{id:1,nombre:'Manzana (Demo)',precio:1000,categoria:'frutas',stock:10}];
     } finally {
-        loading.style.display = 'none';
-        generarCategorias();
+        loading.style.display='none';
+        inicializarCategorias();
         filtrarPorCategoria('todos');
-        // Actualizamos estado (se intentará de nuevo tras cargar horarios)
-        actualizarBotonesProductos(); 
+        
+        cargarHorariosRemotos();
+        
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if(saved) { carrito = JSON.parse(saved); actualizarCarritoUI(); }
     }
 }
 
-function generarCategorias() {
-    const categorias = new Set(productos.map(p => p.categoria));
-    categoriasLista.innerHTML = `<li><a href="#" data-categoria="todos" class="activo">Todos los Productos</a></li>`;
-    if (productos.some(p => p.promocion)) categoriasLista.innerHTML += `<li><a href="#" data-categoria="promocion">🔥 Promociones</a></li>`;
-    categorias.forEach(cat => {
-        if (!['promocion','todos',''].includes(cat)) categoriasLista.innerHTML += `<li><a href="#" data-categoria="${cat}">${cat.charAt(0).toUpperCase()+cat.slice(1)}</a></li>`;
+// --- LOGICA DE CATEGORIAS ---
+function inicializarCategorias() {
+    const cats = new Set(productos.map(p => p.categoria));
+    const catsOrdenadas = Array.from(cats).sort();
+
+    categoriasLista.innerHTML = `<li><a href="#" data-categoria="todos" class="activo">Todas</a></li>`;
+    if(productos.some(p=>p.promocion)) categoriasLista.innerHTML += `<li><a href="#" data-categoria="promocion">🔥 Ofertas</a></li>`;
+    
+    selectCategoria.innerHTML = `<option value="todos">Todas las categorías</option>`;
+    if(productos.some(p=>p.promocion)) selectCategoria.innerHTML += `<option value="promocion">🔥 Ofertas</option>`;
+
+    catsOrdenadas.forEach(cat => {
+        if(!['promocion','todos',''].includes(cat)) {
+            const nombreCat = cat.charAt(0).toUpperCase() + cat.slice(1);
+            categoriasLista.innerHTML += `<li><a href="#" data-categoria="${cat}">${nombreCat}</a></li>`;
+            const option = document.createElement('option');
+            option.value = cat;
+            option.text = nombreCat;
+            selectCategoria.appendChild(option);
+        }
     });
 
     categoriasLista.querySelectorAll('a').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
-            categoriasLista.querySelectorAll('a').forEach(x => x.classList.remove('activo'));
-            a.classList.add('activo');
-            filtrarPorCategoria(a.dataset.categoria);
+            const cat = a.dataset.categoria;
+            selectCategoria.value = cat; 
+            filtrarPorCategoria(cat);
         });
+    });
+
+    selectCategoria.addEventListener('change', (e) => {
+        filtrarPorCategoria(e.target.value);
     });
 }
 
-function renderizarProductos(productosFiltrados) {
+function filtrarPorCategoria(cat) {
+    categoriasLista.querySelectorAll('a').forEach(a => {
+        a.classList.toggle('activo', a.dataset.categoria === cat);
+    });
+    buscador.value = ''; 
+    if(cat==='todos') renderizarProductos(productos);
+    else if(cat==='promocion') renderizarProductos(productos.filter(p=>p.promocion));
+    else renderizarProductos(productos.filter(p=>p.categoria===cat));
+}
+
+// Buscador
+buscador.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    selectCategoria.value = 'todos'; 
+    categoriasLista.querySelectorAll('a').forEach(x => x.classList.remove('activo'));
+    if(!term) renderizarProductos(productos);
+    else renderizarProductos(productos.filter(p => p.nombre.toLowerCase().includes(term)));
+});
+
+function renderizarProductos(lista) {
     productosContainer.innerHTML = '';
-    if (!productosFiltrados.length) {
-        productosContainer.innerHTML = '<p style="padding: 20px; text-align:center; width:100%;">No hay productos disponibles.</p>';
-        return;
-    }
+    if(!lista.length) { productosContainer.innerHTML = '<p style="width:100%; text-align:center;">No hay productos.</p>'; return; }
     
-    productosFiltrados.forEach(producto => {
-        const card = document.createElement('div');
-        // Clase condicional si no tiene imagen para ajustar el diseño
-        const claseImagen = producto.img ? '' : 'sin-imagen';
-        card.className = `producto-card ${claseImagen}`;
-        
-        let htmlImagen = '';
-        if(producto.img) {
-            htmlImagen = `<img src="${producto.img}" alt="${producto.nombre}" loading="lazy">`;
-        }
-
-        card.innerHTML = `
-            ${producto.promocion ? '<div class="cinta-oferta">OFERTA</div>' : ''}
-            ${htmlImagen}
-            <h3>${producto.nombre}</h3>
-            <span class="precio">${formatPrice(producto.precio)}</span>
-            <button class="btn-agregar" data-id="${producto.id}" disabled>
-                Cargando...
-            </button>
+    lista.forEach(p => {
+        const div = document.createElement('div');
+        div.className = `producto-card ${p.img?'':'sin-imagen'}`;
+        div.innerHTML = `
+            ${p.promocion?'<div class="cinta-oferta">OFERTA</div>':''}
+            ${p.img?`<img src="${p.img}" loading="lazy">`:''}
+            <h3>${p.nombre}</h3>
+            <span class="precio">${formatPrice(p.precio)}</span>
+            <button class="btn-agregar" data-id="${p.id}">Cargando...</button>
         `;
-        productosContainer.appendChild(card);
+        productosContainer.appendChild(div);
     });
-
     actualizarBotonesProductos();
-
-    document.querySelectorAll('.btn-agregar').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if(btn.closest('#modal-horarios')) return;
-            if (!negocioAbierto) {
-                showToast("El negocio está cerrado.");
-                return;
-            }
-            const prod = productos.find(p => p.id == btn.dataset.id);
-            agregarAlCarrito(prod);
-        });
-    });
+    document.querySelectorAll('.btn-agregar').forEach(btn => btn.addEventListener('click', ()=> agregarAlCarrito(productos.find(p=>p.id==btn.dataset.id))));
 }
 
-function filtrarPorCategoria(categoria) {
-    if(categoria==='todos') renderizarProductos(productos);
-    else if(categoria==='promocion') renderizarProductos(productos.filter(p=>p.promocion));
-    else renderizarProductos(productos.filter(p=>p.categoria===categoria));
-}
-
-function agregarAlCarrito(prod) {
-    const existe = carrito.find(p => p.id === prod.id);
-    if(existe){
-        if(existe.cantidad<prod.stock) { existe.cantidad++; showToast(`+1 ${prod.nombre}`); }
-        else showToast(`Sin stock extra de ${prod.nombre}`);
+// --- Carrito ---
+function agregarAlCarrito(p) {
+    if(!p) return;
+    const item = carrito.find(x => x.id === p.id);
+    if(item) {
+        if(item.cantidad < p.stock) item.cantidad++;
+        else return showToast("Stock máximo alcanzado");
     } else {
-        carrito.push({ ...prod, cantidad:1 });
-        showToast(`${prod.nombre} agregado`);
+        carrito.push({...p, cantidad:1});
     }
+    showToast(`Agregado: ${p.nombre}`);
+    btnVerCarrito.classList.add('pop'); setTimeout(()=>btnVerCarrito.classList.remove('pop'),300);
     actualizarCarritoUI();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(carrito));
 }
 
 function actualizarCarritoUI() {
     modalCarritoItemsContainer.innerHTML = '';
     let total = 0;
-    
-    if(carrito.length === 0) {
-        modalCarritoItemsContainer.innerHTML = '<p style="text-align:center; color:#999;">El carrito está vacío.</p>';
+    if(!carrito.length) {
+        modalCarritoItemsContainer.innerHTML = '<p style="text-align:center; color:#999;">Carrito vacío</p>';
+        btnVaciar.style.display='none'; btnEnviarPedido.disabled=true;
+    } else {
+        btnVaciar.style.display='block'; btnEnviarPedido.disabled=false;
     }
 
     carrito.forEach(item => {
@@ -926,59 +1029,67 @@ function actualizarCarritoUI() {
         const div = document.createElement('div');
         div.className = 'modal-carrito-item';
         div.innerHTML = `
-            <span style="flex:1;">${item.nombre}</span>
+            <div style="flex:1"><b>${item.nombre}</b><br><small>${formatPrice(item.precio)}</small></div>
             <div class="controles-cantidad">
-                <button class="btn-cantidad" data-id="${item.id}" data-accion="-">-</button>
+                <button class="btn-cantidad" data-id="${item.id}" data-op="-">-</button>
                 <span>${item.cantidad}</span>
-                <button class="btn-cantidad" data-id="${item.id}" data-accion="+">+</button>
+                <button class="btn-cantidad" data-id="${item.id}" data-op="+">+</button>
             </div>
-            <span style="width:80px; text-align:right;">${formatPrice(item.precio * item.cantidad)}</span>
+            <div style="width:70px; text-align:right;">${formatPrice(item.precio*item.cantidad)}</div>
         `;
         modalCarritoItemsContainer.appendChild(div);
     });
     totalHeader.textContent = formatPrice(total);
     modalTotal.textContent = formatPrice(total);
 
-    modalCarritoItemsContainer.querySelectorAll('.btn-cantidad').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const item = carrito.find(p => p.id == btn.dataset.id);
-            if(btn.dataset.accion==='+') {
-                if(item.cantidad<item.stock) item.cantidad++;
-            } else {
-                item.cantidad--;
-                if(item.cantidad===0) carrito = carrito.filter(p=>p.id!==item.id);
-            }
+    modalCarritoItemsContainer.querySelectorAll('.btn-cantidad').forEach(b => {
+        b.addEventListener('click', () => {
+            const it = carrito.find(x=>x.id==b.dataset.id);
+            if(b.dataset.op === '+') { if(it.cantidad < it.stock) it.cantidad++; }
+            else { it.cantidad--; if(it.cantidad<=0) carrito = carrito.filter(x=>x.id!==it.id); }
             actualizarCarritoUI();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(carrito));
         });
     });
 }
+btnVaciar.addEventListener('click', ()=> { if(confirm('¿Vaciar?')) { carrito=[]; actualizarCarritoUI(); localStorage.removeItem(STORAGE_KEY); } });
 
-// Inicializar
-cargarProductosRemotos();
-cargarHorariosRemotos();
-// Recargar estado cada minuto
-setInterval(verificarEstadoNegocio, 60000);
+// Modales y Envio
+btnVerCarrito.addEventListener('click', ()=> modal.classList.add('visible'));
+document.getElementById('btn-cerrar-modal').addEventListener('click', ()=> modal.classList.remove('visible'));
+document.getElementById('btn-abrir-horarios').addEventListener('click', ()=> modalHorarios.classList.add('visible'));
+document.getElementById('btn-cerrar-horarios').addEventListener('click', ()=> modalHorarios.classList.remove('visible'));
 
-// Enviar pedido WhatsApp
 btnEnviarPedido.addEventListener('click', (e) => {
     e.preventDefault();
-    if(carrito.length === 0) { showToast("El carrito está vacío"); return; }
+    verificarEstadoNegocio();
+    if(!negocioAbierto) return alert("El negocio está cerrado en este momento.");
     
-    const nombre = document.getElementById('nombre').value;
-    const celular = document.getElementById('celular').value; // No usado en enlace pero útil para registro
-    if(!nombre || !celular) { showToast("Completa tus datos"); return; }
+    const nom = formCliente.querySelector('#nombre').value;
+    const cel = formCliente.querySelector('#celular').value;
+    if(!nom || !cel) return alert("Completa tus datos");
+    if(!carrito.length) return alert("Carrito vacio");
 
-    let mensaje = `Hola! Soy *${nombre}*. Quiero pedir:\n\n`;
-    let total = 0;
-    carrito.forEach(p => {
-        mensaje += `▪ ${p.cantidad} x ${p.nombre} ($${p.precio*p.cantidad})\n`;
-        total += p.precio * p.cantidad;
-    });
-    mensaje += `\n*TOTAL: $${total}*`;
+    const total = carrito.reduce((a,b)=>a+b.precio*b.cantidad,0);
+    const detalle = carrito.map(i=>`${i.cantidad}x ${i.nombre}`).join(' | ');
+
+    btnEnviarPedido.textContent = "Procesando...";
     
-    const link = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
-    window.open(link, '_blank');
+    // Registro Sheets
+    fetch(URL_SHEET_REGISTRO, { method:'POST', mode:'cors', body: JSON.stringify({negocio_id:negocioActual, nombre_cliente:nom, celular_cliente:cel, detalle_compra:detalle, total:total}) }).catch(console.error);
+
+    setTimeout(() => {
+        const msg = `Hola El Fresquito! Soy *${nom}*. Pedido:%0A${carrito.map(i=>`▪ ${i.cantidad}x ${i.nombre}`).join('%0A')}%0A*Total: ${formatPrice(total)}*`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+        carrito=[]; localStorage.removeItem(STORAGE_KEY); actualizarCarritoUI();
+        modal.classList.remove('visible');
+        btnEnviarPedido.textContent = "Enviar a WhatsApp";
+    }, 1000);
 });
+
+// Init
+cargarProductosRemotos();
+setInterval(verificarEstadoNegocio, 60000);
 
 });
 </script>
